@@ -1,0 +1,7 @@
+name: NTUtils
+version: @version@
+main: cz.neumimto.utils.Utils
+api-version: 1.16
+authors: [ NeumimTo ]
+description: Utils
+depend: [Civs]
