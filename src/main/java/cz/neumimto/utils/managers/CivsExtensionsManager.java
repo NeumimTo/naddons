@@ -5,6 +5,7 @@ import org.redcastlemedia.multitallented.civs.towns.Town;
 
 import javax.inject.Singleton;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 @Singleton
@@ -49,7 +50,7 @@ public class CivsExtensionsManager implements FileStoreManager {
     @Override
     public void postLoad() {
         if (extensionsConfig.blockBorderMsg == null) {
-            extensionsConfig.blockBorderMsg = new HashSet<>();
+            extensionsConfig.blockBorderMsg = new ArrayList<>();
         }
     }
 }

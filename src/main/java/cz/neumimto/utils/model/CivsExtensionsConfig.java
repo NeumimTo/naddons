@@ -1,14 +1,18 @@
 package cz.neumimto.utils.model;
 
-import com.electronwill.nightconfig.core.conversion.Conversion;
 import com.electronwill.nightconfig.core.conversion.Path;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class CivsExtensionsConfig {
 
     @Path("block-border-msg")
-    public Set<String> blockBorderMsg = new HashSet<>();
+    public List<String> blockBorderMsg;
 
+    @Override
+    public String toString() {
+        return "CivsExtensionsConfig{" +
+                "blockBorderMsg=" + blockBorderMsg +
+                '}';
+    }
 }

@@ -10,7 +10,6 @@ import cz.neumimto.utils.Utils;
 import cz.neumimto.utils.managers.CompassManager;
 import cz.neumimto.utils.model.MapDescriptor;
 import cz.neumimto.utils.model.PlayerCompassConfig;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

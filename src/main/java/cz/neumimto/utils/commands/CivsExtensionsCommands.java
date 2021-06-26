@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.redcastlemedia.multitallented.civs.items.CVItem;
 import org.redcastlemedia.multitallented.civs.towns.Town;
+import org.redcastlemedia.multitallented.civs.towns.TownManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,5 +34,12 @@ public class CivsExtensionsCommands extends BaseCommand {
     @Subcommand("toggle-notification-for-town")
     public void toggleNotification(CommandSender commandSender, Town town) {
         manager.toggleBorderMessage(town);
+    }
+
+    @CommandCompletion("@town")
+    @Subcommand("setpower")
+    public void setPower(CommandSender commandSender, Town town, int power) {
+        TownManager townManager = TownManager.getInstance();
+        townManager.setTownPower(town, power);
     }
 }
