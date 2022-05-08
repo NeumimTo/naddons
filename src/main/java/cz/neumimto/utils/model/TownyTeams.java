@@ -5,21 +5,18 @@ import com.electronwill.nightconfig.core.conversion.Conversion;
 import com.electronwill.nightconfig.core.conversion.Converter;
 import com.electronwill.nightconfig.core.conversion.Path;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Color;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @SuppressWarnings("unchecked")
-public class CivsTeams {
+public class TownyTeams {
 
     @Path("enabled")
     public Boolean enabled = true;
 
     @Path("teams")
-    @Conversion(CivsTeams.NationColorConverter.class)
+    @Conversion(TownyTeams.NationColorConverter.class)
     public Map<String, TextColor> teams = new HashMap<>();
 
     @Path("display")
@@ -57,7 +54,7 @@ public class CivsTeams {
 
     @Override
     public String toString() {
-        return "CivsTeams{" +
+        return "TownyTeams{" +
                 "enabled=" + enabled +
                 ", teams=" + teams +
                 ", display=" + display +

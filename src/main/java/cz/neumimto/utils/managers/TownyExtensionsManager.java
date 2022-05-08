@@ -1,18 +1,22 @@
 package cz.neumimto.utils.managers;
 
-import cz.neumimto.utils.model.CivsExtensionsConfig;
-import org.redcastlemedia.multitallented.civs.towns.Town;
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Town;
+import cz.neumimto.utils.model.TownyExtensionsConfig;
 
 import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Optional;
 
 @Singleton
-public class CivsExtensionsManager implements FileStoreManager {
+public class TownyExtensionsManager implements FileStoreManager {
 
     private Path configPath;
-    private CivsExtensionsConfig extensionsConfig;
+    private TownyExtensionsConfig extensionsConfig;
 
     public void toggleBorderMessage(Town town) {
         if (extensionsConfig.blockBorderMsg.contains(town.getName())) {
@@ -44,7 +48,7 @@ public class CivsExtensionsManager implements FileStoreManager {
 
     @Override
     public void initializeDomain() {
-        extensionsConfig = new CivsExtensionsConfig();
+        extensionsConfig = new TownyExtensionsConfig();
     }
 
     @Override
@@ -52,5 +56,20 @@ public class CivsExtensionsManager implements FileStoreManager {
         if (extensionsConfig.blockBorderMsg == null) {
             extensionsConfig.blockBorderMsg = new ArrayList<>();
         }
+    }
+
+    public void setNationalWorld(String name, Nation nation) {
+        if (extensionsConfig.nationalWorlds == null) {
+            extensionsConfig.nationalWorlds = new HashMap<>();
+        }
+        extensionsConfig.nationalWorlds.put(name, nation.getName());
+    }
+
+    public Optional<Nation> getNationalWorld(String name) {
+        if (extensionsConfig.nationalWorlds == null ||!extensionsConfig.nationalWorlds.containsKey(name)) {
+            return Optional.empty();
+        }
+        String s = extensionsConfig.nationalWorlds.get(name);
+        return Optional.ofNullable(TownyAPI.getInstance().getNation(s));
     }
 }

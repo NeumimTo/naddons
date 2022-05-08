@@ -5,25 +5,25 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Subcommand;
-import cz.neumimto.utils.managers.CivsTeamManager;
-import cz.neumimto.utils.model.CivsTeams;
+import com.palmergames.bukkit.towny.object.Nation;
+import cz.neumimto.utils.managers.TownyTeamManager;
+import cz.neumimto.utils.model.TownyTeams;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.CommandSender;
-import org.redcastlemedia.multitallented.civs.nations.Nation;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
 @Singleton
-@CommandAlias("cvteams|civsteams")
-@CommandPermission("nutils.civsteams")
-public class CivsTeamsCommands extends BaseCommand {
+@CommandAlias("townyteams")
+@CommandPermission("nutils.townyteams")
+public class TownyTeamsCommands extends BaseCommand {
 
     @Inject
-    private CivsTeamManager manager;
+    private TownyTeamManager manager;
     
     @Subcommand("list")
     public void list(CommandSender CommandSender) {
@@ -45,7 +45,7 @@ public class CivsTeamsCommands extends BaseCommand {
     }
 
     @Subcommand("remove")
-    @CommandCompletion("@nation ")
+    @CommandCompletion("@nation")
     public void remove(CommandSender CommandSender, Nation nation) {
         manager.remove(nation);
     }
@@ -53,17 +53,17 @@ public class CivsTeamsCommands extends BaseCommand {
     @Subcommand("enable")
     public void enable(CommandSender commandSender) {
         manager.enable();
-        commandSender.sendMessage("CivsTeams enabled");
+        commandSender.sendMessage("TownyTeams enabled");
     }
 
     @Subcommand("disable")
     public void disable(CommandSender commandSender) {
         manager.disable();
-        commandSender.sendMessage("CivsTeams disabled");
+        commandSender.sendMessage("TownyTeams disabled");
     }
 
     @Subcommand("set-display")
-    public void setDisplay(CommandSender commandSender, CivsTeams.Type type) {
+    public void setDisplay(CommandSender commandSender, TownyTeams.Type type) {
         manager.updateDisplayType(type);
         commandSender.sendMessage("Updated");
     }

@@ -1,33 +1,27 @@
 package cz.neumimto.utils.listeners;
 
-import cz.neumimto.utils.managers.CivsTeamManager;
+import com.palmergames.bukkit.towny.event.NationAddTownEvent;
+import com.palmergames.bukkit.towny.event.TownAddResidentEvent;
+import com.palmergames.bukkit.towny.event.town.TownLeaveEvent;
+import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Town;
+import cz.neumimto.utils.managers.TownyTeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.redcastlemedia.multitallented.civs.events.PlayerAcceptsTownInviteEvent;
-import org.redcastlemedia.multitallented.civs.events.TownJoinedNationEvent;
-import org.redcastlemedia.multitallented.civs.towns.Town;
-import org.redcastlemedia.multitallented.civs.towns.TownManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.List;
 
 @Singleton
-public class CivsTeamListener implements Listener {
+public class TownyTeamListener implements Listener {
 
     @Inject
-    private CivsTeamManager manager;
-
-    private TownManager townManager;
-
-    public CivsTeamListener() {
-        townManager = TownManager.getInstance();
-    }
+    private TownyTeamManager manager;
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -39,23 +33,23 @@ public class CivsTeamListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoinTown(PlayerAcceptsTownInviteEvent event) {
+    public void onPlayerJoinTown(TownLeaveEvent event) {
         if (!manager.teamsEnabled()) {
             return;
         }
-        Player player = Bukkit.getPlayer(event.getUuid());
+        Player player = event.getResident().getPlayer();
         manager.updateTeam(player);
     }
 
     @EventHandler
-    public void onTownJoinNation(TownJoinedNationEvent event) {
+    public void onTownJoinNation(NationAddTownEvent event) {
         if (!manager.teamsEnabled()) {
             return;
         }
         Town town = event.getTown();
-        HashMap<UUID, String> rawPeople = town.getRawPeople();
-        for (UUID uuid : rawPeople.keySet()) {
-            Player player = Bukkit.getPlayer(uuid);
+        List<Resident> residents = town.getResidents();
+        for (Resident resident : residents) {
+            Player player = Bukkit.getPlayer(resident.getUUID());
             if (player != null) {
                 manager.updateTeam(player);
             }
@@ -69,4 +63,5 @@ public class CivsTeamListener implements Listener {
         }
         manager.deleteTeam(event.getPlayer());
     }
+
 }

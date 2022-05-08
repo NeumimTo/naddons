@@ -4,19 +4,17 @@ import co.aikar.commands.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyUniverse;
+import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.object.TownyObject;
 import cz.neumimto.utils.commands.*;
 import cz.neumimto.utils.listeners.*;
 import cz.neumimto.utils.managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.redcastlemedia.multitallented.civs.items.CVItem;
-import org.redcastlemedia.multitallented.civs.items.CivItem;
-import org.redcastlemedia.multitallented.civs.items.ItemManager;
-import org.redcastlemedia.multitallented.civs.nations.Nation;
-import org.redcastlemedia.multitallented.civs.nations.NationManager;
-import org.redcastlemedia.multitallented.civs.towns.Town;
-import org.redcastlemedia.multitallented.civs.towns.TownManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,27 +61,26 @@ public final class Utils extends JavaPlugin {
         }
 
         initManagers(new HashMap<Class<? extends FileStoreManager>, String>() {{
-            put(ResourcepackManager.class, "resourcepack.conf");
             put(ArmorstandManager.class, "armorstandcommands.conf");
-            put(CivsTeamManager.class, "civsteams.conf");
+            put(TownyTeamManager.class, "civsteams.conf");
             put(CompassManager.class, "compass.conf");
-            put(CivsExtensionsManager.class, "civsextensions.conf");
+            put(TownyExtensionsManager.class, "civsextensions.conf");
+            put(PerWorldGamemodeManager.class, "perworldgamemode.conf");
         }});
 
         registerCommands(Arrays.asList(
-                ResourcePackCommands.class,
                 ArmorStandCommands.class,
-                CivsTeamsCommands.class,
+                TownyTeamsCommands.class,
                 HudModCommands.class,
                 CompassCommands.class,
-                CivsExtensionsCommands.class));
+                PerWorldGamemodeCommands.class));
 
         registerListeners(Arrays.asList(
-                ResourcepackListener.class,
                 ArmorstandListener.class,
-                CivsTeamListener.class,
+                TownyTeamListener.class,
                 CompassListener.class,
-                CivsExtensionListener.class));
+                TownyExtensionListener.class,
+                WorldGamemodeListener.class));
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, HudModListener.CHANNEL);
         getServer().getMessenger().registerIncomingPluginChannel( this, HudModListener.CHANNEL, injector.getInstance(HudModListener.class));
@@ -100,40 +97,11 @@ public final class Utils extends JavaPlugin {
     private void registerCommands(List<Class<? extends BaseCommand>> cmds) {
         PaperCommandManager paperCommandManager = new PaperCommandManager(this);
 
-        paperCommandManager.getCommandCompletions().registerAsyncCompletion("nation", c->{
-            NationManager instance = NationManager.getInstance();
-            return instance.getAllNations().stream().map(Nation::getName).collect(Collectors.toList());
-        });
-        paperCommandManager.getCommandCompletions().registerAsyncCompletion("Town", c->{
-            TownManager instance = TownManager.getInstance();
-            return instance.getTownNames();
-        });
-        paperCommandManager.getCommandCompletions().registerAsyncCompletion("cvitem", c->{
-            ItemManager itemManager = new ItemManager();
-            Map<String, CivItem> allItemTypes = itemManager.getAllItemTypes();
-            return allItemTypes.entrySet().stream()
-                    .filter(a->a.getValue().getItemType() == CivItem.ItemType.TOWN || a.getValue().getItemType() == CivItem.ItemType.REGION)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-        });
-        paperCommandManager.getCommandContexts().registerContext(CVItem.class, c -> {
-            ItemManager itemManager = ItemManager.getInstance();
-
-            String lookup = c.popFirstArg();
-
-            boolean allowMissing = c.isOptional();
-
-            CVItem cvItem = itemManager.getAllItemTypes().get(lookup);
-            if (cvItem == null && !allowMissing) {
-                throw new InvalidCommandArgument(true);
-            }
-            return cvItem;
-        });
+        paperCommandManager.getCommandCompletions().registerAsyncCompletion("nation", c-> TownyUniverse.getInstance().getNations().stream().map(TownyObject::getName).collect(Collectors.toList()));
+        paperCommandManager.getCommandCompletions().registerAsyncCompletion("Town", c-> TownyUniverse.getInstance().getTowns().stream().map(TownyObject::getName).collect(Collectors.toList()));
         paperCommandManager.getCommandContexts().registerContext(Nation.class, c -> {
-            NationManager instance = NationManager.getInstance();
-
             String lookup = c.popFirstArg();
-            Nation nation = instance.getNation(lookup);
+            Nation nation = TownyAPI.getInstance().getNation(lookup);
             boolean allowMissing = c.isOptional();
 
             if (nation == null && !allowMissing) {
@@ -142,10 +110,8 @@ public final class Utils extends JavaPlugin {
             return nation;
         });
         paperCommandManager.getCommandContexts().registerContext(Town.class, c -> {
-            TownManager instance = TownManager.getInstance();
-
             String lookup = c.popFirstArg();
-            Town town = instance.getTown(lookup);
+            Town town = TownyAPI.getInstance().getTown(lookup);
             boolean allowMissing = c.isOptional();
 
             if (town == null && !allowMissing) {

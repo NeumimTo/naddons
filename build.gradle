@@ -1,17 +1,15 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
 }
 
 group = 'cz.neumimto'
 version = '1.0-SNAPSHOT'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
-apply plugin: 'com.github.johnrengelman.shadow'
+sourceCompatibility = "17"
+targetCompatibility = "17"
 
 repositories {
     mavenCentral()
@@ -28,6 +26,10 @@ repositories {
         name = 'menu-api'
         url = 'https://repo.inventivetalent.org/content/groups/public/'
     }
+    maven {
+        name = "towny"
+        url = "https://repo.glaremasters.me/repository/towny/"
+    }
 }
 
 compileJava {
@@ -37,33 +39,37 @@ compileJava {
 }
 
 dependencies {
-    compile 'com.google.inject:guice:5.0.1'
-    compile "co.aikar:acf-paper:0.5.0-SNAPSHOT"
-    compile 'com.github.stefvanschie.inventoryframework:IF:0.9.5'
+    implementation 'com.google.inject:guice:5.0.1'
+    implementation "co.aikar:acf-paper:0.5.0-SNAPSHOT"
+    implementation 'com.github.stefvanschie.inventoryframework:IF:0.9.5'
 
-    implementation 'com.electronwill.night-config:hocon:3.6.3'
+    implementation 'com.electronwill.night-config:hocon:3.6.5'
 
+    compileOnly 'com.palmergames.bukkit.towny:towny:0.98.1.0'
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'jarlibs', include: ['*.jar'])
 
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.7.1'
-    testCompile 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
 }
 
 processResources {
+    setDuplicatesStrategy(DuplicatesStrategy.WARN)
+
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
     }
 }
 
 shadowJar {
-    relocate 'co.aikar.commands', 'shaded.acf.commands'
-    relocate 'co.aikar.locales', 'shaded.acf.locales'
-    relocate 'com.google.inject', 'shaded.inject'
-}
-
-tasks.withType(Jar) {
-    destinationDirectory = file("$rootDir/.server/plugins/")
+    relocate 'co.aikar.commands', 'nutils.acf.commands'
+    relocate 'co.aikar.locales', 'nutils.acf.locales'
+    relocate 'com.google', 'nutils.google'
+    relocate 'com.github', 'nutils.github'
 }
 
 build.dependsOn shadowJar
+
+test {
+    useJUnitPlatform()
+}

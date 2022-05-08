@@ -1,6 +1,9 @@
 package cz.neumimto.utils.managers;
 
-import cz.neumimto.utils.model.CivsTeams;
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Resident;
+import cz.neumimto.utils.model.TownyTeams;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -8,29 +11,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.redcastlemedia.multitallented.civs.nations.Nation;
-import org.redcastlemedia.multitallented.civs.nations.NationManager;
-import org.redcastlemedia.multitallented.civs.towns.TownManager;
 
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.util.*;
 
 @Singleton
-public class CivsTeamManager implements FileStoreManager {
+public class TownyTeamManager implements FileStoreManager {
 
     private Path configPath;
-    private CivsTeams ct;
+    private TownyTeams ct;
     private Scoreboard civsboard;
     private Map<UUID, Team> teamByPlayer = new HashMap<>();
-
-    private NationManager nationManager;
-    private TownManager townManager;
-
-    public CivsTeamManager() {
-        nationManager = NationManager.getInstance();
-        townManager = TownManager.getInstance();
-    }
 
     public TextColor getColor(String nationName) {
         return ct.teams.get(nationName);
@@ -41,7 +33,8 @@ public class CivsTeamManager implements FileStoreManager {
     }
 
     private Nation getNation(Player player) {
-        return nationManager.getNationByPlayer(player.getUniqueId());
+        Resident resident = TownyAPI.getInstance().getResident(player);
+        return TownyAPI.getInstance().getResidentNationOrNull(resident);
     }
 
     private TextColor getPlayerColor(Player player) {
@@ -107,7 +100,7 @@ public class CivsTeamManager implements FileStoreManager {
         }
     }
 
-    public void updateDisplayType(CivsTeams.Type type) {
+    public void updateDisplayType(TownyTeams.Type type) {
         ct.display = type;
         save();
         updateAllPlayers();
@@ -148,7 +141,7 @@ public class CivsTeamManager implements FileStoreManager {
 
     @Override
     public void initializeDomain() {
-        ct = new CivsTeams();
+        ct = new TownyTeams();
         civsboard = Bukkit.getScoreboardManager().getMainScoreboard();
     }
 }
